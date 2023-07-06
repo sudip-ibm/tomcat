@@ -1,0 +1,27 @@
+name: linux-s390x
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v2
+
+      - name: Build and test on Arch Linux s390x
+        env:
+          ARCH_IMAGE: archlinux/s390x
+        run: |
+          docker run --privileged --rm -v /dev:/dev -v /lib/modules:/lib/modules \
+            -e CI=true -e GITHUB_WORKSPACE=/github/workspace -w /github/workspace \
+            $ARCH_IMAGE sh -c '
+            pacman -Sy --noconfirm
+            pacman -S --noconfirm base-devel
+            pacman -S --noconfirm maven
+            sudo apt-get update
